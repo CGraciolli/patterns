@@ -44,9 +44,9 @@ def test_prefers_warehouse_batches_to_shipments():
     batch1 = Batch("batch1", "sku1", 20, tomorrow, "shipment")
     batch2 = Batch("batch1", "sku1", 20, tomorrow, "warehouse")
     
-    ## TODO: shipment an warehouse shoul probably be classes
+    ## TODO: shipment an warehouse shoul be an Enumerate
     
-    chosen_batch = order.chose_batch(batch1, batch2)
+    chosen_batch = order.choose_batch(batch1, batch2)
     
     assert chosen_batch == batch2
 
