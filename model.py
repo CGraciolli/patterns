@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 from enum import Enum, auto
 
@@ -42,24 +42,37 @@ class Batch:
         self.qty = qty
         self.eta = eta
         self.batch_type = batch_type
-        self.available_qty = qty
-        self.allocated_lines = []
+        self._available_qty = qty
+        self._allocated_lines = []
+    
+    @property
+    def available_qty(self) -> int:
+        return self._available_qty
+    
+    @property
+    def allocated_quantity(self) -> int:
+        return self.qty - self.available_qty
+    
+    @property
+    def allocated_lines(self) -> List[OrderLine]:
+        return self._allicated_lines
+    
     
     def can_allocate(self, order: OrderLine) -> bool:
         if self.sku == order.sku:
-            return self.available_qty >= order.qty
+            return self._available_qty >= order.qty
         else:
             return False
     
     def allocate(self, order: OrderLine) -> None:
         if self.can_allocate(order):
-            self.available_qty -= order.qty
-            self.allocated_lines.append(order)
+            self._available_qty -= order.qty
+            self._allocated_lines.append(order)
             
     def can_deallocate(self, order: OrderLine) -> bool:
-        return order in self.allocated_lines
+        return order in self._allocated_lines
     
     def deallocate(self, order: OrderLine) -> None:
         if self.can_deallocate(order):
-            self.allocated_lines.remove(order)
-            self.available_qty += order.qty
+            self._allocated_lines.remove(order)
+            self._available_qty += order.qty
