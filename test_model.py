@@ -37,6 +37,12 @@ def test_can_allocate_if_available_equal_to_required():
     batch = Batch("batch1", "sku1", 2)
     
     assert batch.can_allocate(order)
+    
+def test_cannot_allocalate_if_skus_dont_match():
+    order = OrderLine("order1", "sku1", 2)
+    batch = Batch("batch1", "sku2", 2)
+    
+    assert not batch.can_allocate(order)
 
 
 def test_prefers_warehouse_batches_to_shipments():
@@ -59,3 +65,21 @@ def test_prefers_earlier_batches():
     chosen_batch = order.choose_batch(batch1, batch2)
     
     assert chosen_batch == batch1
+
+def test_doesnt_choose_unallocatable_batches():
+    order = OrderLine("order1", "sku1", 2)
+    batch1 = Batch("batch1", "sku2", 20, tomorrow)
+    batch2 = Batch("batch1", "sku1", 20, later)
+    
+    chosen_batch = order.choose_batch(batch1, batch2)
+    
+    assert chosen_batch == batch2
+
+def test_doesnt_choose_if_batches_cant_allocate():
+    order = OrderLine("order1", "sku1", 2)
+    batch1 = Batch("batch1", "sku2", 20, tomorrow)
+    batch2 = Batch("batch1", "sku1", 1, later)
+    
+    chosen_batch = order.choose_batch(batch1, batch2)
+    
+    assert chosen_batch == None
