@@ -43,6 +43,7 @@ class Batch:
         self.eta = eta
         self.batch_type = batch_type
         self.available_qty = qty
+        self.allocated_lines = []
     
     def can_allocate(self, order: OrderLine) -> bool:
         if self.sku == order.sku:
@@ -53,3 +54,12 @@ class Batch:
     def allocate(self, order: OrderLine) -> None:
         if self.can_allocate(order):
             self.available_qty -= order.qty
+            self.allocated_lines.append(order)
+            
+    def can_deallocate(self, order: OrderLine) -> bool:
+        return order in self.allocated_lines
+    
+    def deallocate(self, order: OrderLine) -> None:
+        if self.can_deallocate(order):
+            self.allocated_lines.remove(order)
+            self.available_qty += order.qty
