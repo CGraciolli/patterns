@@ -55,10 +55,11 @@ class Batch:
     
     @property
     def allocated_lines(self) -> List[OrderLine]:
-        return self._allicated_lines
-    
+        return self._allocated_lines
     
     def can_allocate(self, order: OrderLine) -> bool:
+        if order in self.allocated_lines:
+            return False
         if self.sku == order.sku:
             return self._available_qty >= order.qty
         else:

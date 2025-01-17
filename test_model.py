@@ -105,3 +105,10 @@ def test_can_deallocate_allocated_lines():
     
     assert batch.available_qty == 20
     
+def test_allocation_is_idempotent():
+    batch, line = make_batch_and_line("RED-LAMP", 20, 2)
+    
+    batch.allocate(line)
+    batch.allocate(line)
+    
+    assert batch.available_qty == 18
