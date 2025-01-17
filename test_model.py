@@ -84,7 +84,7 @@ def test_doesnt_choose_unallocatable_batches():
 def test_doesnt_choose_if_batches_cant_allocate():
     order = OrderLine("order1", "sku1", 2)
     batch1 = Batch("batch1", "sku2", 20, BatchType.SHIPMENT, tomorrow)
-    batch2 = Batch("batch1", "sku1", 1, BatchType.SHIPMENT, later)
+    batch2 = Batch("batch2", "sku1", 1, BatchType.SHIPMENT, later)
     
     chosen_batch = order.choose_batch(batch1, batch2)
     
@@ -112,3 +112,11 @@ def test_allocation_is_idempotent():
     batch.allocate(line)
     
     assert batch.available_qty == 18
+    
+    
+def test_batch_identified_by_reference():
+    batch1 = Batch("batch1", "sku2", 20, BatchType.SHIPMENT, tomorrow)
+    batch2 = Batch("batch1", "sku1", 1, BatchType.SHIPMENT, later)
+    
+    assert batch1 == batch2
+    

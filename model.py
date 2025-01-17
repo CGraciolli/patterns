@@ -44,6 +44,14 @@ class Batch:
         self.batch_type = batch_type
         self._available_qty = qty
         self._allocated_lines = []
+        
+    def __eq__(self, other):
+        if not isinstance(other, Batch):
+            return False
+        return other.reference == self.reference
+    
+    def __hash__(self):
+        return hash(self.reference)
     
     @property
     def available_qty(self) -> int:
