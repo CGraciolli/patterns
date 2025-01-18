@@ -3,16 +3,19 @@ from typing import Optional, List
 from datetime import date
 
 
-
 @dataclass(frozen=True)
 class OrderLine:
     orderid: str
     sku: str
-    qty: int 
+    qty: int
 
 
 class Batch:
-    def __init__(self, ref: str, sku: str, qty: int, eta: Optional[date] = None):
+    def __init__(self,
+                 ref: str,
+                 sku: str,
+                 qty: int,
+                 eta: Optional[date] = None):
         self.reference = ref
         self.sku = sku
         self.qty = qty
@@ -28,6 +31,12 @@ class Batch:
     def __hash__(self):
         return hash(self.reference)
     
+    def __gt__(self, other):
+        if self.eta is None:
+            return False
+        if other.eta is None:
+            return True
+        return self.eta > other.eta    
     @property
     def available_qty(self) -> int:
         return self._available_qty
@@ -62,16 +71,25 @@ class Batch:
             self._available_qty += order.qty
 
 
-def allocate(order: OrderLine, batches: List[Batch]) -> None:
+def allocate(order: OrderLine, batches: List[Batch]) -> str | None:
+    """Is given a OrderLine and a list of Batches,
+    chooses the batch with the lowest eta to which the order can be allocated
+    and returns its reference if possible,
+    returns None if the other can't be allocated to aby of the batches.
+
+    Args:
+        order (OrderLine)
+        batches (List[Batch])
+
+    Returns:
+        str: chosen batch reference
+    """
     # first we filter the batches that can allocate
-    allocatable_batches = filter(lambda batch: batch.can_allocate(order),
-                                 batches)
+    allocatable_batches = list(filter(lambda batch: batch.can_allocate(order), batches))
     # then we choose the one with the smallest eta (None if possible)
-    chosen_batch = min(allocatable_batches,
-                       key=lambda batch: batch.eta or date.min,
-                       default=None)
-    
-    # and we allocate the order to it
-    if chosen_batch:
+    if len(allocatable_batches) > 0:
+        chosen_batch = sorted(allocatable_batches)[0]
+        # and we allocate the order to it
         chosen_batch.allocate(order)
-    
+        return chosen_batch.reference
+    return None

@@ -49,3 +49,12 @@ def test_doesnt_choose_if_batches_cant_allocate():
     
     assert batch2.available_qty == 1
     assert batch1.available_qty == 20
+
+def test_returns_allocated_batch_ref():
+    order = OrderLine("order1", "sku1", 2)
+    batch1 = Batch("batch1", "sku1", 20, tomorrow)
+    batch2 = Batch("batch2", "sku1", 1, later)
+    
+    allocation = allocate(order, [batch1, batch2])
+    
+    assert allocation == batch1.reference
