@@ -10,24 +10,6 @@ class OrderLine:
     sku: str
     qty: int 
 
-    # def choose_batch(self, batch1, batch2):
-    #     if batch1.can_allocate(self) and batch2.can_allocate(self):
-    #         if batch1.batch_type.value == batch2.batch_type.value:
-    #             if batch1.eta <= batch2.eta:
-    #                 return batch1
-    #             else:
-    #                 return batch2
-    #         elif batch1.batch_type.value < batch2.batch_type.value:
-    #             return batch1
-    #         else:
-    #             return batch2
-    #     elif batch1.can_allocate(self):
-    #         return batch1
-    #     elif batch2.can_allocate(self):
-    #         return batch2
-    #     else:
-    #         return None
-
 
 class Batch:
     def __init__(self, ref: str, sku: str, qty: int, eta: Optional[date] = None):
@@ -81,4 +63,15 @@ class Batch:
 
 
 def allocate(order: OrderLine, batches: List[Batch]) -> None:
-    pass
+    # first we filter the batches that can allocate
+    allocatable_batches = filter(lambda batch: batch.can_allocate(order),
+                                 batches)
+    # then we choose the one with the smallest eta (None if possible)
+    chosen_batch = min(allocatable_batches,
+                       key=lambda batch: batch.eta or date.min,
+                       default=None)
+    
+    # and we allocate the order to it
+    if chosen_batch:
+        chosen_batch.allocate(order)
+    

@@ -50,7 +50,6 @@ def test_cannot_allocalate_if_skus_dont_match():
     
     assert not batch.can_allocate(order)
     
-    
 
 def test_can_only_deallocate_allocated_lines():
     batch, unallocated_line = make_batch_and_line("RED-LAMP", 20, 2)
