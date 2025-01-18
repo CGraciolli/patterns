@@ -1,0 +1,11 @@
+from datetime import date, timedelta
+import pytest
+
+# from model import ...
+from model import allocate, deallocate, OrderLine, Batch, BatchType
+
+today = date.today()
+tomorrow = today + timedelta(days=1)
+later = tomorrow + timedelta(days=10)
+
+

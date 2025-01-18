@@ -9,7 +9,6 @@ class BatchType(Enum):
     SHIPMENT = auto()
 
 
-
 @dataclass(frozen=True)
 class OrderLine:
     orderid: str
@@ -85,3 +84,6 @@ class Batch:
         if self.can_deallocate(order):
             self._allocated_lines.remove(order)
             self._available_qty += order.qty
+
+
+def allocate(order: OrderLine, batches: List[Batch]):
