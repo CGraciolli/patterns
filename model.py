@@ -69,6 +69,10 @@ class Batch:
         if self.can_deallocate(order):
             self._allocated_lines.remove(order)
             self._available_qty += order.qty
+            
+
+class OutOfStock(Exception):
+    pass
 
 
 def allocate(order: OrderLine, batches: List[Batch]) -> str | None:
@@ -92,4 +96,4 @@ def allocate(order: OrderLine, batches: List[Batch]) -> str | None:
         # and we allocate the order to it
         chosen_batch.allocate(order)
         return chosen_batch.reference
-    return None
+    raise OutOfStock(f"Out of stock for sku {order.sku}")
